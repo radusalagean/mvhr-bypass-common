@@ -1,11 +1,20 @@
 #ifndef LOCAL_CONTRACT_H
 #define LOCAL_CONTRACT_H
 
-#define LOCAL_CONTRACT_START_REQUEST 1
-#define LOCAL_CONTRACT_END_REQUEST 2
-#define LOCAL_CONTRACT_START_RESPONSE 3
-#define LOCAL_CONTRACT_END_RESPONSE 4
+/**
+ * Serial transmission packet structure
+ * ************************************
+ * 0x01 - Start of heading (SOH)
+ * ... heading ...
+ * 0x02 - Start of text (STX)
+ * ... payload ...
+ * 0x03 - End of text (ETX)
+ */
 
-#define LOCAL_CONTRACT_REQUEST_STATE 10
+#define CONTROL_SOH 0x01
+#define CONTROL_STX 0x02
+#define CONTROL_ETX 0x03
+
+#define LOCAL_CONTRACT_REQUEST_STATE 0x30
 
 #endif
