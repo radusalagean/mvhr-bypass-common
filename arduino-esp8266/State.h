@@ -11,6 +11,6 @@ typedef struct
     uint8_t extAdMin; /* min: 10 | max: extAdMax - 3 */
     uint8_t extAdMax; /* min: extAdMin + 3 | max: 40 */
     float hysteresis; /* min: 0.0 | max: 1.0 */
-} State;
+} __attribute__((packed)) State;
 
 #endif
