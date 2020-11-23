@@ -36,14 +36,15 @@ bool BaseSerialNetwork::handleNextTransmissionControlByte(const uint8_t stage)
     byte controlByte = dataLineSerial->read();
     if (transmissionControlOrder[stage] == controlByte)
     {
-        if (!waitForBytes()) return false;
         switch (controlByte)
         {
         case CONTROL_SOH:
+            if (!waitForBytes()) return false;
             transmissionPacket.code = dataLineSerial->read();
             return true;
         case CONTROL_STX:
             // get the body size
+            if (!waitForBytes()) return false;
             transmissionPacket.bodySize = dataLineSerial->read();
             if (transmissionPacket.bodySize) // expect a body
             {
