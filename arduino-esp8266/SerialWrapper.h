@@ -10,7 +10,9 @@ private:
 public:
     virtual int available() = 0;
     virtual void print(const char str[]) = 0;
+    virtual void print(char c) = 0;
     virtual void println(const char str[]) = 0;
+    virtual void println(char c) = 0;
     virtual byte read() = 0;
     virtual void write(byte b) = 0;
 };
