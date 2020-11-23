@@ -15,13 +15,14 @@ class BaseSerialNetwork
 {
 private:
     SerialWrapper* dataLineSerial = NULL;
-    SerialWrapper* debugLineSerial = NULL;
+    SerialWrapper* debugLineSerialRx = NULL;
+    SerialWrapper* debugLineSerialTx = NULL;
     void discardPacket();
     bool handleNextTransmissionControlByte(const uint8_t stage);
     bool waitForBytes();
 
 protected:
-    BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrapper* debugLineSerial);
+    BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrapper* debugLineSerialRx, SerialWrapper* debugLineSerialTx);
     TransmissionPacket transmissionPacket = {};
     virtual void processPacket() = 0;
 

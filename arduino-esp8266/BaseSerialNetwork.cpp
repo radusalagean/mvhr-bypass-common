@@ -1,9 +1,10 @@
 #include "BaseSerialNetwork.h"
 
-BaseSerialNetwork::BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrapper* debugLineSerial)
+BaseSerialNetwork::BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrapper* debugLineSerialRx, SerialWrapper* debugLineSerialTx)
 {
     this->dataLineSerial = dataLineSerial;
-    this->debugLineSerial = debugLineSerial;
+    this->debugLineSerialRx = debugLineSerialRx;
+    this->debugLineSerialTx = debugLineSerialTx;
 }
 
 void BaseSerialNetwork::handleOutstandingPackets()
@@ -16,9 +17,9 @@ void BaseSerialNetwork::handleOutstandingPackets()
             if (!waitForBytes() || dataLineSerial->read() != CONTROL_DLE || 
                 !handleNextTransmissionControlByte(stage))
             {
-                debugLineSerial->print("Corrupt packet (stage = ");
-                debugLineSerial->print(stage);
-                debugLineSerial->println(")");
+                debugLineSerialTx->print("Corrupt packet (stage = ");
+                debugLineSerialTx->print(stage);
+                debugLineSerialTx->println(")");
                 discardPacket();
                 return;
             }
@@ -70,7 +71,7 @@ bool BaseSerialNetwork::waitForBytes()
     {
         if (millis() - packetWaitStartTime > PACKET_WAIT_TIMEOUT)
         {
-            debugLineSerial->println("Packet wait timeout");
+            debugLineSerialTx->println("Packet wait timeout");
             discardPacket();
             return false;
         }
