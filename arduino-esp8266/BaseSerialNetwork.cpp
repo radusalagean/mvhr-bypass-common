@@ -1,18 +1,24 @@
 #include "BaseSerialNetwork.h"
 
+BaseSerialNetwork::BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrapper* debugLineSerial)
+{
+    this->dataLineSerial = dataLineSerial;
+    this->debugLineSerial = debugLineSerial;
+}
+
 void BaseSerialNetwork::handleOutstandingPackets()
 {
-    if (DataLineSerial.available())
+    if (dataLineSerial->available())
     {
         // Receive packet
         for (uint8_t stage = 0; stage < CONTROL_BYTES_COUNT; stage++)
         {
-            if (!waitForBytes() || DataLineSerial.read() != CONTROL_DLE || 
+            if (!waitForBytes() || dataLineSerial->read() != CONTROL_DLE || 
                 !handleNextTransmissionControlByte(stage))
             {
-                DebugLineSerial.print("Corrupt packet (stage = ");
-                DebugLineSerial.print(stage);
-                DebugLineSerial.println(")");
+                debugLineSerial->print("Corrupt packet (stage = ");
+                debugLineSerial->print(stage);
+                debugLineSerial->println(")");
                 discardPacket();
                 return;
             }
@@ -26,25 +32,25 @@ void BaseSerialNetwork::handleOutstandingPackets()
 bool BaseSerialNetwork::handleNextTransmissionControlByte(const uint8_t stage)
 {
     if (!waitForBytes()) return false;
-    byte controlByte = DataLineSerial.read();
+    byte controlByte = dataLineSerial->read();
     if (transmissionControlOrder[stage] == controlByte)
     {
         if (!waitForBytes()) return false;
         switch (controlByte)
         {
         case CONTROL_SOH:
-            transmissionPacket.code = DataLineSerial.read();
+            transmissionPacket.code = dataLineSerial->read();
             return true;
         case CONTROL_STX:
             // get the body size
-            transmissionPacket.bodySize = DataLineSerial.read();
+            transmissionPacket.bodySize = dataLineSerial->read();
             if (transmissionPacket.bodySize) // expect a body
             {
                 transmissionPacket.bodyPtr = new byte[transmissionPacket.bodySize];   
                 for (int i = 0; i < transmissionPacket.bodySize; i++)
                 {
                     if (!waitForBytes()) return false;
-                    transmissionPacket.bodyPtr[i] = DataLineSerial.read();
+                    transmissionPacket.bodyPtr[i] = dataLineSerial->read();
                 }
             }
             return true;
@@ -57,14 +63,14 @@ bool BaseSerialNetwork::handleNextTransmissionControlByte(const uint8_t stage)
 
 bool BaseSerialNetwork::waitForBytes()
 {
-    if (DataLineSerial.available())
+    if (dataLineSerial->available())
         return true;
     unsigned long packetWaitStartTime = millis();
-    while (!DataLineSerial.available())
+    while (!dataLineSerial->available())
     {
         if (millis() - packetWaitStartTime > PACKET_WAIT_TIMEOUT)
         {
-            DebugLineSerial.println("Packet wait timeout");
+            debugLineSerial->println("Packet wait timeout");
             discardPacket();
             return false;
         }
@@ -84,14 +90,14 @@ void BaseSerialNetwork::discardPacket()
 
 void BaseSerialNetwork::sendPacket(TransmissionPacket& packet)
 {
-    DataLineSerial.write(CONTROL_DLE);
-    DataLineSerial.write(CONTROL_SOH);
-    DataLineSerial.write(packet.code);
-    DataLineSerial.write(CONTROL_DLE);
-    DataLineSerial.write(CONTROL_STX);
-    DataLineSerial.write(packet.bodySize);
+    dataLineSerial->write(CONTROL_DLE);
+    dataLineSerial->write(CONTROL_SOH);
+    dataLineSerial->write(packet.code);
+    dataLineSerial->write(CONTROL_DLE);
+    dataLineSerial->write(CONTROL_STX);
+    dataLineSerial->write(packet.bodySize);
     for (int i = 0; i < packet.bodySize; i++)
-        DataLineSerial.write(packet.bodyPtr[i]);
-    DataLineSerial.write(CONTROL_DLE);  
-    DataLineSerial.write(CONTROL_ETX);  
+        dataLineSerial->write(packet.bodyPtr[i]);
+    dataLineSerial->write(CONTROL_DLE);  
+    dataLineSerial->write(CONTROL_ETX);  
 }
