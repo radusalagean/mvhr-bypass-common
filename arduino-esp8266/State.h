@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 
-#define STATE_KEY "state"
 #define STATE_NUM_OF_FIELDS 6
 
 typedef struct
