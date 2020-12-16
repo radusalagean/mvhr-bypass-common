@@ -7,6 +7,12 @@ BaseSerialNetwork::BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrappe
     this->debugLineSerialTx = debugLineSerialTx;
 }
 
+void BaseSerialNetwork::send(uint8_t code)
+{
+    TransmissionPacket packet = {code};
+    sendPacket(packet);
+}
+
 void BaseSerialNetwork::handleOutstandingPackets()
 {
     if (dataLineSerial->available())

@@ -26,26 +26,38 @@ private:
 protected:
     BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrapper* debugLineSerialRx, SerialWrapper* debugLineSerialTx);
     TransmissionPacket transmissionPacket = {};
-    virtual void sendPacket(TransmissionPacket& packet);
+    template<typename T>
+    T* receive(const byte* body);
+    void sendPacket(TransmissionPacket& packet);
     virtual void processPacket() = 0;
 
 public:
     void handleOutstandingPackets();
+    void send(uint8_t code);
     template<typename T>
-    void send(T* t, uint8_t code);
+    void send(uint8_t code, T* t);
 };
 
 template<typename T>
-void BaseSerialNetwork::send(T* t, uint8_t code)
+void BaseSerialNetwork::send(uint8_t code, T* obj)
 {
     byte* buffer = new byte[sizeof(T)];
-    memcpy(buffer, t, sizeof(T));
+    memcpy(buffer, obj, sizeof(T));
     TransmissionPacket packet =
     {
         code, sizeof(T), buffer
     };
     sendPacket(packet);
     delete[] buffer;
+}
+
+template<typename T>
+T* BaseSerialNetwork::receive(const byte* body)
+{
+    size_t size = sizeof(T);
+    T* ptr = new T; // Make sure to free the memory after using this object!
+    memcpy(ptr, body, size);
+    return ptr;
 }
 
 #endif
