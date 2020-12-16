@@ -1,6 +1,8 @@
 #ifndef BASE_SERIAL_NETWORK_H
 #define BASE_SERIAL_NETWORK_H
 
+class BaseSerialNetwork;
+
 #include <Arduino.h>
 #include <string.h>
 #include "LocalContract.h"
