@@ -5,6 +5,12 @@
 
 #define STATE_NUM_OF_FIELDS 6
 
+#define STATE_TEMPERATURES_RANGE_LOW 10
+#define STATE_TEMPERATURES_RANGE_HIGH 40
+#define STATE_HYST_RANGE_LOW 0.f
+#define STATE_HYST_RANGE_HIGH 1.f
+#define STATE_RANGE_MIN_VALUES 3
+
 typedef struct
 {
     bool hrModeAuto;
