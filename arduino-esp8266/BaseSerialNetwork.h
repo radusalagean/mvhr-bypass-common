@@ -27,7 +27,7 @@ protected:
     BaseSerialNetwork(SerialWrapper* dataLineSerial, SerialWrapper* debugLineSerialRx, SerialWrapper* debugLineSerialTx);
     TransmissionPacket transmissionPacket = {};
     template<typename T>
-    T* receivePacketBodyObject(const byte* body);
+    T* receivePacketBodyObject();
     void sendPacket(TransmissionPacket& packet);
     virtual void processPacket() = 0;
 
@@ -52,11 +52,11 @@ void BaseSerialNetwork::send(uint8_t code, T* obj)
 }
 
 template<typename T>
-T* BaseSerialNetwork::receivePacketBodyObject(const byte* body)
+T* BaseSerialNetwork::receivePacketBodyObject()
 {
     size_t size = sizeof(T);
     T* ptr = new T; // Make sure to free the memory after using this object!
-    memcpy(ptr, body, size);
+    memcpy(ptr, transmissionPacket.bodyPtr, size);
     return ptr;
 }
 
